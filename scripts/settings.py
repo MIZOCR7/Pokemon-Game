@@ -24,5 +24,24 @@ COLORS = {
 }
 
 WORLD_LAYERS = {
+  'water': 0,
+  'bg': 1,
+  'shadow': 2,
+  'main': 3,
+  'top': 4,
+}
+
+
+BATTLE_POSITIONS = {
+  'left': {'top': (360, 260), 'center': (190, 400), 'bottom': (410, 520)},
+  'right': {'top': (900, 260), 'center': (1110, 390), 'bottom': (900, 550)},
+}
+
+BATTLE_LAYERS = {
+  'outline': 0,
+  'name': 1,
+  'monster': 2,
+  'effects': 3,
+  'overlay': 4,
   
 }
