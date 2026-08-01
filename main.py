@@ -2,7 +2,7 @@ import pygame
 from scripts.settings import *
 from pytmx.util_pygame import load_pygame
 from scripts.sprites import Sprite, AnimatedSprite
-from scripts.entities import Player
+from scripts.entities import Player, Character
 from scripts.groups import AllSprites 
 from scripts.support import *
 
@@ -21,7 +21,7 @@ class Game:
     self.import_assets()
     self.setup(self.tmx_maps['world'], 'house') 
     
-    
+  
   def import_assets(self):
     self.tmx_maps = {
       'world': load_pygame('assets/data/maps/world.tmx'),  
@@ -30,9 +30,10 @@ class Game:
       }
     self.overworld_frames = {
       'water': import_folder('assets', 'graphics', 'tilesets', 'water'),
-      
-    }
-     
+      'coast': coast_import(24, 12, 'assets', 'graphics', 'tilesets', 'coast'),
+      'characters': all_character_import('assets', 'graphics', 'characters'), 
+    } 
+    
      
   def setup(self, tmx_map, player_start_pos):
     
@@ -48,15 +49,34 @@ class Game:
     
     
     for obj in tmx_map.get_layer_by_name('Entities'):
-      if obj.name == 'Player' and obj.properties['pos'] == player_start_pos:
-        self.player = Player((obj.x, obj.y), self.all_sprites) 
-    
+      if obj.name == 'Player':
+        if obj.properties['pos'] == player_start_pos:
+          self.player = Player(
+            pos=(obj.x, obj.y), 
+            frames=self.overworld_frames['characters']['player'], 
+            groups=self.all_sprites,
+            facing_direction=obj.properties['direction'],) 
+      
+      else:
+        Character(
+          pos = (obj.x, obj.y),
+          frames=self.overworld_frames['characters'][obj.properties['graphic']], 
+          groups=self.all_sprites,  
+          facing_direction=obj.properties['direction'],
+        ) 
+      
     for obj in tmx_map.get_layer_by_name('Water'):
       for x in range(int(obj.x), int(obj.x + obj.width), TILE_SIZE):
         for y in range(int(obj.y), int(obj.y + obj.height), TILE_SIZE):
           AnimatedSprite((x,y), self.overworld_frames['water'], self.all_sprites) 
     
-      
+    for obj in tmx_map.get_layer_by_name("Coast"):
+      terrain = obj.properties['terrain'] 
+      side = obj.properties['side'] 
+      AnimatedSprite((obj.x, obj.y), self.overworld_frames['coast'][terrain][side], self.all_sprites) 
+  
+    
+    
   def run(self):
     while True:
       dt = self.clock.tick() / 1000  
