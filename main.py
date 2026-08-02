@@ -1,10 +1,11 @@
 import pygame 
 from scripts.settings import *
 from pytmx.util_pygame import load_pygame
-from scripts.sprites import Sprite, AnimatedSprite
+from scripts.sprites import Sprite, AnimatedSprite, MonsterPatchSprite, BorderSprite, CollidableSprite
 from scripts.entities import Player, Character
 from scripts.groups import AllSprites 
 from scripts.support import *
+
 
 class Game:
   def __init__(self):
@@ -14,7 +15,7 @@ class Game:
     self.clock = pygame.time.Clock() 
     
     self.all_sprites = AllSprites()
-    
+    self.collision_sprites = pygame.sprite.Group() 
     
     
     
@@ -38,14 +39,40 @@ class Game:
   def setup(self, tmx_map, player_start_pos):
     
     for layer in ['Terrain', 'Terrain Top']:
-    
       for x, y, surf in tmx_map.get_layer_by_name(layer).tiles():
-            Sprite((x*TILE_SIZE, y*TILE_SIZE), surf, self.all_sprites)
+            Sprite((x*TILE_SIZE, y*TILE_SIZE), surf, self.all_sprites, WORLD_LAYERS['bg'])
     
+    for obj in tmx_map.get_layer_by_name('Water'):
+      for x in range(int(obj.x), int(obj.x + obj.width), TILE_SIZE):
+        for y in range(int(obj.y), int(obj.y + obj.height), TILE_SIZE):
+          AnimatedSprite((x,y), self.overworld_frames['water'], self.all_sprites, WORLD_LAYERS['water']) 
+
+    
+    for obj in tmx_map.get_layer_by_name("Coast"):
+      terrain = obj.properties['terrain'] 
+      side = obj.properties['side'] 
+      AnimatedSprite((obj.x, obj.y), self.overworld_frames['coast'][terrain][side], self.all_sprites, WORLD_LAYERS['bg']) 
+      
     
     
     for obj in tmx_map.get_layer_by_name('Objects'):
-      Sprite((obj.x, obj.y), obj.image, self.all_sprites) 
+      if obj.name == 'top': 
+        Sprite((obj.x, obj.y), obj.image, self.all_sprites, WORLD_LAYERS['top'])  
+      else: 
+        CollidableSprite((obj.x, obj.y), obj.image, (self.all_sprites, self.collision_sprites))  
+    
+    
+    for obj in tmx_map.get_layer_by_name('Collisions'):
+      BorderSprite((obj.x, obj.y), pygame.Surface((obj.width, obj.height)), self.collision_sprites) 
+    
+    
+    for obj in tmx_map.get_layer_by_name("Monsters"):
+      MonsterPatchSprite( 
+        pos = (obj.x, obj.y),
+        surf=obj.image,
+        groups=self.all_sprites, 
+        biome=obj.properties['biome'] 
+      ) 
     
     
     for obj in tmx_map.get_layer_by_name('Entities'):
@@ -55,25 +82,18 @@ class Game:
             pos=(obj.x, obj.y), 
             frames=self.overworld_frames['characters']['player'], 
             groups=self.all_sprites,
-            facing_direction=obj.properties['direction'],) 
+            facing_direction=obj.properties['direction'],
+            collision_sprites=self.collision_sprites) 
       
       else:
         Character(
           pos = (obj.x, obj.y),
           frames=self.overworld_frames['characters'][obj.properties['graphic']], 
-          groups=self.all_sprites,  
+          groups=(self.all_sprites, self.collision_sprites),  
           facing_direction=obj.properties['direction'],
         ) 
       
-    for obj in tmx_map.get_layer_by_name('Water'):
-      for x in range(int(obj.x), int(obj.x + obj.width), TILE_SIZE):
-        for y in range(int(obj.y), int(obj.y + obj.height), TILE_SIZE):
-          AnimatedSprite((x,y), self.overworld_frames['water'], self.all_sprites) 
     
-    for obj in tmx_map.get_layer_by_name("Coast"):
-      terrain = obj.properties['terrain'] 
-      side = obj.properties['side'] 
-      AnimatedSprite((obj.x, obj.y), self.overworld_frames['coast'][terrain][side], self.all_sprites) 
   
     
     
@@ -86,7 +106,6 @@ class Game:
           pygame.quit()
           exit() 
       
-      
       self.all_sprites.update(dt) 
       self.display_surface.fill('black') 
       self.all_sprites.draw(self.player.rect.center)  
@@ -98,4 +117,3 @@ game = Game()
 if __name__ == '__main__':
   game.run() 
     
-
