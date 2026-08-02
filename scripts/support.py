@@ -94,3 +94,13 @@ def all_character_import(*path):
       image_name = image.split('.')[0] 
       new_dict[image_name] = character_importer(4, 4, *path, image_name) 
   return new_dict
+
+
+def check_connection(radius, player, character, tolerence=30):
+  relation = Vector(character.rect.center) - Vector(player.rect.center) 
+  if relation.length() < radius:
+    if player.facing_direction == 'left' and relation.x < 0 and abs(relation.y) < tolerence or\
+      player.facing_direction == 'right' and relation.x > 0 and abs(relation.y) < tolerence or\
+        player.facing_direction == 'up' and relation.y < 0 and abs(relation.x) < tolerence or\
+          player.facing_direction == 'down' and relation.y > 0 and abs(relation.x) < tolerence: 
+      return True 
