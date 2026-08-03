@@ -104,3 +104,12 @@ def check_connection(radius, player, character, tolerence=30):
         player.facing_direction == 'up' and relation.y < 0 and abs(relation.x) < tolerence or\
           player.facing_direction == 'down' and relation.y > 0 and abs(relation.x) < tolerence: 
       return True 
+    
+    
+def tmx_importer(*path):
+  tmx_dict = {}
+  for folder_path, sub_folders, file_names in walk(join(*path)):
+    for file in file_names:
+      tmx_dict[file.split('.')[0]] = load_pygame(join(folder_path, file)) 
+  
+  return tmx_dict 
