@@ -9,6 +9,7 @@ from scripts.game_data import *
 from scripts.dialog import DialogTree
 from scripts.monster import Monster 
 from scripts.monster_indexes import MonsterIndex
+from scripts.battle import Battle 
 
 
 class Game:
@@ -47,6 +48,7 @@ class Game:
     
     self.monster_index = MonsterIndex(self.player_monsters, self.fonts, self.monster_frames)  
     self.index_open = False 
+    self.battle = Battle(self.player_monsters, self.dummy_monsters, self.monster_frames, self.bg_frames['forest'], self.fonts)
     
   
   def import_assets(self):
@@ -70,6 +72,16 @@ class Game:
       'small': pygame.font.Font(join('assets', 'graphics', 'fonts', 'PixeloidSans.ttf'), 14), 
       'bold': pygame.font.Font(join('assets', 'graphics', 'fonts', 'dogicapixelbold.otf'), 20), 
     } 
+    
+    self.dummy_monsters = {
+      0: Monster('Atrox', 12),
+      1: Monster('Sparchu', 15),
+      2: Monster('Gulfin', 15),
+      3: Monster('Jacana', 2),
+      4: Monster('Pouch', 3), 
+    } 
+    
+    self.bg_frames = import_folder_dict('assets', 'graphics', 'backgrounds')
     
      
   def setup(self, tmx_map, player_start_pos):
@@ -169,7 +181,7 @@ class Game:
   
   
   def input(self):
-    if not self.dialog_tree:
+    if not self.dialog_tree and not self.battle: 
       keys = pygame.key.get_just_pressed()
       if keys[pygame.K_SPACE]:
         for character in self.character_sprites:
@@ -211,6 +223,7 @@ class Game:
       self.all_sprites.draw(self.player)  
       
       if self.dialog_tree: self.dialog_tree.update() 
+      if self.battle: self.battle.update(dt) 
       if self.index_open:
         self.monster_index.update(dt)
       
