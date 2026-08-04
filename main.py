@@ -61,7 +61,7 @@ class Game:
     self.monster_frames = {
       'icons': import_folder_dict('assets', 'graphics', 'icons'),
       'monsters': monster_importer(4,2,'assets', 'graphics', 'monsters'),
-      
+      'ui': import_folder_dict('assets', 'graphics', 'ui'), 
     }
     
     self.fonts = {
