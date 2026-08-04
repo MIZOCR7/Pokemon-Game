@@ -19,6 +19,9 @@ class Monster:
     self.level_up = self.level * 150 
     self.abilities = MONSTER_DATA[name]['abilities'] 
     
+  def __repr__(self):
+    return f'monster: {self.name}, lvl: {self.level}' 
+    
   
   def get_stats(self):
     return {
