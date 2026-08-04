@@ -1,6 +1,6 @@
 import pygame
 from pygame.math import Vector2 as Vector
-from sys import exit
+from sys import exit 
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720
 TILE_SIZE = 64
@@ -42,6 +42,21 @@ BATTLE_LAYERS = {
   'name': 1,
   'monster': 2,
   'effects': 3,
-  'overlay': 4,
+  'overlay': 4, 
   
+}
+
+
+
+BATTLE_CHOICES = {
+	'full': {
+		'fight':  {'pos' : Vector(30, -60), 'icon': 'sword'},
+		'defend': {'pos' : Vector(40, -20), 'icon': 'shield'},
+		'switch': {'pos' : Vector(40, 20), 'icon': 'arrows'},
+		'catch':  {'pos' : Vector(30, 60), 'icon': 'hand'}},
+	
+	'limited': {
+		'fight':  {'pos' : Vector(30, -40), 'icon': 'sword'},
+		'defend': {'pos' : Vector(40, 0), 'icon': 'shield'},
+		'switch': {'pos' : Vector(30, 40), 'icon': 'arrows'}} 
 }
